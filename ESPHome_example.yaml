@@ -1,0 +1,68 @@
+esphome:
+  name: irblaster1
+  platform: ESP32
+  board: esp-wrover-kit
+
+wifi:
+  ssid: "PUTSSIDHERE"
+  password: "PUTPASSHERE"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Irblaster1 Fallback Hotspot"
+    password: "PUTPASSHERE"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "PUTPASSHERE"
+
+ota:
+  password: "PUTPASSHERE"
+
+remote_receiver:
+  pin:
+    number: GPIO33
+    inverted: True
+  dump: all
+  
+remote_transmitter:
+  pin: GPIO32
+  carrier_duty_percent: 50%
+
+# Individual switches
+switch:
+  - platform: template
+    name: "Beamer"
+    turn_on_action:
+      remote_transmitter.transmit_lg:
+        data: 0xCC0000FF
+        nbits: 32
+        repeat:
+          times: 2
+          wait_time: 1s
+
+i2c:
+  sda: 21
+  scl: 22
+  scan: True
+  id: bus_a
+        
+sensor:
+  - platform: bme680
+    temperature:
+      name: "Temperature"
+      oversampling: 16x
+    pressure:
+      name: "Pressure"
+    humidity:
+      name: "Humidity"
+    gas_resistance:
+      name: "Gas Resistance"
+    i2c_id: bus_a
+    address: 0x76
+    update_interval: 60s 
